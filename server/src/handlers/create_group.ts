@@ -1,14 +1,23 @@
+import { db } from '../db';
+import { groupsTable } from '../db/schema';
 import { type CreateGroupInput, type Group } from '../schema';
 
-export async function createGroup(input: CreateGroupInput): Promise<Group> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is to create a new chat group in the database.
-    // This syncs with the blockchain group creation event.
-    return Promise.resolve({
-        id: 1, // Placeholder ID
+export const createGroup = async (input: CreateGroupInput): Promise<Group> => {
+  try {
+    // Insert group record
+    const result = await db.insert(groupsTable)
+      .values({
         group_id: input.group_id,
         name: input.name,
-        creator: input.creator,
-        created_at: new Date()
-    } as Group);
-}
+        creator: input.creator
+      })
+      .returning()
+      .execute();
+
+    const group = result[0];
+    return group;
+  } catch (error) {
+    console.error('Group creation failed:', error);
+    throw error;
+  }
+};

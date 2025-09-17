@@ -1,8 +1,19 @@
+import { db } from '../db';
+import { usersTable } from '../db/schema';
 import { type User } from '../schema';
+import { desc } from 'drizzle-orm';
 
 export async function getAllUsers(): Promise<User[]> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is to fetch all registered users from the database.
-    // This will be used to populate the user list in the chat interface.
-    return Promise.resolve([]);
+  try {
+    // Fetch all users ordered by registration timestamp (newest first)
+    const results = await db.select()
+      .from(usersTable)
+      .orderBy(desc(usersTable.created_at))
+      .execute();
+
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch all users:', error);
+    throw error;
+  }
 }
